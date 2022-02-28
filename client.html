@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<p id="text"></p>
+<img src="" id="img">
+</body>
+</html>
+
+<script>
+  var ws;
+  var jsonMessage
+var pyip='192.168.43.70';
+function startWS() {
+    console.log('start once again');
+    ws = new WebSocket("ws://"+pyip+":8124");
+    ws.onopen =  function (msg) {
+        console.log('webSocket opened');
+    };
+    ws.onmessage = function (message) {
+        // console.log('receive message : ' + message.data);
+        jsonMessage = JSON.parse(message.data)
+        if(jsonMessage.hasOwnProperty("id")){
+            document.getElementById("text").innerHTML=jsonMessage.id;
+        }else if(jsonMessage.hasOwnProperty("img")){
+            document.getElementById("img").setAttribute("src",jsonMessage.img);
+		    var image = new Image();
+		    image.onload = function () {
+			    context.clearRect(0, 0,  canvas.width, canvas.height);
+			    context.drawImage(image, 0, 0,canvas.width, canvas.height);
+		    }
+		    image.src =message.data;
+        }
+        // console.log('receive message : ' + jsonMessage["img"])
+    };
+    ws.onerror = function (error) {
+        console.log('error :' + error.name + error.number);
+    };
+    ws.onclose =  function () {
+        console.log('webSocket closed');
+    };
+    ws.send("websocket from js");
+}
+startWS();
+
+</script>
